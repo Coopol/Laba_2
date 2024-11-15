@@ -32,7 +32,10 @@ public:
 
     ~Grid() // деструктор
     {
-        delete[] data;
+           if (y_size == 1 && x_size == 1) 
+           {delete data;} 
+           else 
+           {delete[] data;}
     }
 
     Grid(Grid const& other): y_size(other.y_size), x_size(other.x_size) // конструктор копирования
