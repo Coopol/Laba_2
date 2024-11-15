@@ -1,4 +1,5 @@
 #include <iostream>
+#include<cassert>
 using namespace std;
 
 template<typename T>
@@ -9,8 +10,8 @@ public:
     using size_type = unsigned;
 
 private:
-    T* data;                   
-    size_type y_size, x_size;  
+    T* data;
+    size_type y_size, x_size;
 
 public:
     Grid(T const& t): y_size(1), x_size(1) // конструктор 1
@@ -32,10 +33,10 @@ public:
 
     ~Grid() // деструктор
     {
-           if (y_size == 1 && x_size == 1) 
-           {delete data;} 
-           else 
-           {delete[] data;}
+        if (y_size == 1 && x_size == 1) 
+        {delete data; }
+        else 
+        {delete[] data;}
     }
 
     Grid(Grid const& other): y_size(other.y_size), x_size(other.x_size) // конструктор копирования
@@ -79,6 +80,16 @@ public:
         return *this;
     }
 
+    T* operator[](size_type index) // оператор индексирования
+    {
+        return &data[index * x_size]; 
+    }
+
+    const T* operator[](size_type index) const
+    {
+        return &data[index * x_size];
+    }
+
     T operator()(size_type y_idx, size_type x_idx) const // + проверка на выход из массива
     {
         if (y_idx >= y_size || x_idx >= x_size) 
@@ -96,15 +107,28 @@ public:
         return data[y_idx * x_size + x_idx];
     }
 
-    Grid& operator=(T const& t)
-    {
-        for (auto it = data, end = data + x_size * y_size; it != end; ++it) 
-        {
-            *it = t;
-        }
-        return *this;
-    }
-
     size_type get_y_size() const { return y_size; }
     size_type get_x_size() const { return x_size; }
 };
+
+int main()
+{
+    Grid<float> g(3, 2, 0.0f);
+    assert(3 == g.get_y_size());
+    assert(2 == g.get_x_size());
+
+    using gsize_t = Grid<int>::size_type;
+
+    for(gsize_t y_idx = 0; y_idx != g.get_y_size(); ++y_idx)
+    for(gsize_t x_idx = 0; x_idx != g.get_x_size(); ++x_idx)
+        assert(0.0f == g[y_idx][x_idx]);
+
+    for(gsize_t y_idx = 0; y_idx != g.get_y_size(); ++y_idx)
+    for(gsize_t x_idx = 0; x_idx != g.get_x_size(); ++x_idx)
+        g[y_idx][x_idx] = 1.0f;
+
+    for(gsize_t y_idx = 0; y_idx != g.get_y_size(); ++y_idx)
+    for(gsize_t x_idx = 0; x_idx != g.get_x_size(); ++x_idx)
+        assert(1.0f == g(y_idx , x_idx));
+    return 0;
+}
